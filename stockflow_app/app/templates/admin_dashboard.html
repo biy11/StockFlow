@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_dashboard.css') }}">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <a href="#">Dashboard</a>
+        <a href="#">Manage Users</a>
+        <a href="#">Orders</a>
+        <a href="#">Settings</a>
+        <a href="#" class="active">Log Out</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navigation Bar -->
+        <div class="top-nav">
+            <button onclick="window.location.href='{{ url_for('main.logout') }}'">Log Out</button>
+        </div>
+
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1>Welcome, Admin</h1>
+        </div>
+
+        <!-- Cards Section -->
+        <div class="cards">
+            <div class="card">
+                <h3>Users Overview</h3>
+                <p>Total users: 45</p>
+                <p>Active users: 39</p>
+            </div>
+            <div class="card">
+                <h3>Recent Orders</h3>
+                <p>Pending orders: 12</p>
+                <p>Completed orders: 54</p>
+            </div>
+            <div class="card">
+                <h3>System Status</h3>
+                <p>Uptime: 99.99%</p>
+                <p>Last backup: 2 hours ago</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

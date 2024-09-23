@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='operative_dashboard.css') }}">
+    <title>Operative Dashboard</title>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <div class="nav-links">
+            <a href="#">Dashboard</a>
+            <a href="#">Tasks</a>
+            <a href="#">Orders</a>
+            <a href="#">Settings</a>
+        </div>
+
+        <!-- Logout Button -->
+        <form action="{{ url_for('main.logout') }}" method="POST" style="display:inline;">
+            <button class="logout-btn" type="submit">Logout</button>
+        </form>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <h1>Welcome to the Operative Dashboard</h1>
+
+        <!-- Cards Section -->
+        <div class="cards">
+            <div class="card">
+                <h3>Current Tasks</h3>
+                <p>10 Active Tasks</p>
+            </div>
+            <div class="card">
+                <h3>Completed Orders</h3>
+                <p>54 Orders Completed</p>
+            </div>
+            <div class="card">
+                <h3>Pending Orders</h3>
+                <p>12 Orders Pending</p>
+            </div>
+            <div class="card">
+                <h3>Assigned Shifts</h3>
+                <p>3 Shifts This Week</p>
+            </div>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer">
+            <p>&copy; 2024 Operative Dashboard</p>
+        </div>
+    </div>
+
+</body>
+</html>
