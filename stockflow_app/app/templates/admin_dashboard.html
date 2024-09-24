@@ -12,106 +12,206 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <h2>Admin Panel</h2>
-        <a href="#">Dashboard</a>
-        <a href="#manage-users-section">Manage Users</a>
-        <a href="#">Orders</a>
-        <a href="#">Settings</a>
+        <a href="#" data-section="dashboard" class="active">Dashboard</a>
+        <a href="#" data-section="manage-users">Manage Users</a>
+        <a href="#" data-section="orders">Orders</a>
+        <a href="#" data-section="settings">Settings</a>
         <a href="{{ url_for('main.logout') }}" class="logout">Log Out</a>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Dashboard Header -->
-        <div class="dashboard-header">
-            <h1>Welcome, Admin</h1>
+        <!-- Dashboard Section -->
+        <div id="dashboard-section">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <h1>Welcome, Admin</h1>
+            </div>
+
+            <!-- Cards Section -->
+            <div class="cards">
+                <div class="card">
+                    <h3>Users Overview</h3>
+                    <p>Total users: {{ total_users }}</p>
+                    <p>Active users: {{ active_users }}</p>
+                </div>
+                <div class="card">
+                    <h3>Recent Orders</h3>
+                    <p>Pending orders: 12</p>
+                    <p>Completed orders: 54</p>
+                </div>
+                <div class="card">
+                    <h3>System Status</h3>
+                    <p>Uptime: 99.99%</p>
+                    <p>Last backup: 2 hours ago</p>
+                </div>
+            </div>
         </div>
 
-        <!-- Cards Section -->
-        <div class="cards">
-            <div class="card">
-                <h3>Users Overview</h3>
-                <p>Total users: {{ total_users }}</p>
-                <p>Active users: {{ active_users }}</p>
+        <!-- Manage Users Section -->
+        <div id="manage-users-section" style="display: none;">
+            <!-- All Operatives Section -->
+            <div class="all-operatives">
+                <h2>All Operatives</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Login Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in operatives %}
+                        <tr>
+                            <td>{{ user.first_name }}</td>
+                            <td>{{ user.last_name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.status }}</td>
+                            <td>
+                                {% if user.is_logged_in %}
+                                    <span style="color: green;">Online</span>
+                                {% else %}
+                                    <span style="color: red;">Offline</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <div class="card">
-                <h3>Recent Orders</h3>
-                <p>Pending orders: 12</p>
-                <p>Completed orders: 54</p>
-            </div>
-            <div class="card">
-                <h3>System Status</h3>
-                <p>Uptime: 99.99%</p>
-                <p>Last backup: 2 hours ago</p>
+
+            <!-- Manage User Registrations -->
+            <div class="manage-users">
+                <h2>Manage User Registrations</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in pending_users %}
+                        <tr>
+                            <td>{{ user.first_name }}</td>
+                            <td>{{ user.last_name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.status }}</td>
+                            <td>
+                                <form action="{{ url_for('main.approve_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="approve-btn">Approve</button>
+                                </form>
+                                <form action="{{ url_for('main.decline_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="decline-btn">Decline</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- All Operatives Section -->
-        <div id="all-operatives-section" class="all-operatives">
-            <h2>All Operatives</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Login Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in operatives %}
-                    <tr>
-                        <td>{{ user.first_name }}</td>
-                        <td>{{ user.last_name }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.status }}</td>
-                        <td>
-                            {% if user.is_logged_in %}
-                                <span style="color: green;">Online</span>
-                            {% else %}
-                                <span style="color: red;">Offline</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- Orders Section -->
+        <div id="orders-section" style="display: none;">
+            <!-- File Upload Form for Orders -->
+            <div class="upload-section">
+                <h2>Upload Orders</h2>
+                <form action="{{ url_for('main.upload_orders') }}" method="POST" enctype="multipart/form-data">
+                    <label for="file">Choose CSV or Excel file:</label>
+                    <input type="file" name="file" id="file" accept=".csv, .xls, .xlsx" required>
+                    <button type="submit">Upload</button>
+                </form>
+            </div>
+
+            <!-- All Orders -->
+            <div>
+                <h1>All Orders</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Invoice NO</th>
+                            <th>Order Status</th>
+                            <th>Quantity</th>
+                            <th>ETA</th>
+                            <th>Discrepancies</th>
+                            <th>Cutoff Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ order.sku }}</td>
+                            <td>{{ order.invoice_no }}</td>
+                            <td>{{ order.order_status }}</td>
+                            <td>{{ order.quantity }}</td>
+                            <td>{{ order.eta }}</td>
+                            <td>{{ order.discrepancies }}</td>
+                            <td>{{ order.cutoff_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- Manage Users Section for Pending Registrations -->
-        <div id="manage-users-section" class="manage-users">
-            <h2>Manage User Registrations</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in pending_users %}
-                    <tr>
-                        <td>{{ user.first_name }}</td>
-                        <td>{{ user.last_name }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.status }}</td>
-                        <td>
-                            <form action="{{ url_for('main.approve_user', user_id=user.id) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="approve-btn">Approve</button>
-                            </form>
-                            <form action="{{ url_for('main.decline_user', user_id=user.id) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="decline-btn">Decline</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- Settings Section -->
+        <div id="settings-section" style="display: none;">
+            <!-- Add your settings content here -->
+            <h2>Settings</h2>
+            <p>Settings content goes here.</p>
         </div>
+
     </div>
+
+    <!-- JavaScript to handle navigation -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all sections and sidebar links
+            var sections = document.querySelectorAll('.main-content > div');
+            var sidebarLinks = document.querySelectorAll('.sidebar a');
+
+            // Function to show a section
+            function showSection(sectionId) {
+                sections.forEach(function(section) {
+                    section.style.display = 'none';
+                });
+                document.getElementById(sectionId).style.display = 'block';
+            }
+
+            // Function to set active link
+            function setActiveLink(activeLink) {
+                sidebarLinks.forEach(function(link) {
+                    link.classList.remove('active');
+                });
+                activeLink.classList.add('active');
+            }
+
+            // Add click event listeners to sidebar links
+            sidebarLinks.forEach(function(link) {
+                // Skip the logout link
+                if (link.classList.contains('logout')) return;
+
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    var targetSection = this.getAttribute('data-section') + '-section';
+                    showSection(targetSection);
+                    setActiveLink(this);
+                });
+            });
+
+            // Show the dashboard section by default
+            showSection('dashboard-section');
+            setActiveLink(document.querySelector('.sidebar a[data-section="dashboard"]'));
+        });
+    </script>
 
 </body>
 </html>

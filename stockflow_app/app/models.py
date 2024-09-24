@@ -29,3 +29,14 @@ class Product(db.Model):
     description = db.Column(db.Text, nullable=True)
     price = db.Column(db.Float, nullable=False)
     stock = db.Column(db.Integer, nullable=False)
+
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sku = db.Column(db.String(50), nullable=False)
+    invoice_no = db.Column(db.String(50), nullable=False)
+    order_status = db.Column(db.String(50), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    eta = db.Column(db.DateTime, nullable=False)
+    discrepancies = db.Column(db.String(255), nullable=True)  # Make sure this is a string
+    cutoff_date = db.Column(db.DateTime, nullable=False)
+
