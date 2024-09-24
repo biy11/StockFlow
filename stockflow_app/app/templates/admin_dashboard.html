@@ -1,3 +1,4 @@
+<!-- admin_dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,19 +13,14 @@
     <div class="sidebar">
         <h2>Admin Panel</h2>
         <a href="#">Dashboard</a>
-        <a href="#">Manage Users</a>
+        <a href="#manage-users-section">Manage Users</a>
         <a href="#">Orders</a>
         <a href="#">Settings</a>
-        <a href="#" class="active">Log Out</a>
+        <a href="{{ url_for('main.logout') }}" class="logout">Log Out</a>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Top Navigation Bar -->
-        <div class="top-nav">
-            <button onclick="window.location.href='{{ url_for('main.logout') }}'">Log Out</button>
-        </div>
-
         <!-- Dashboard Header -->
         <div class="dashboard-header">
             <h1>Welcome, Admin</h1>
@@ -34,8 +30,8 @@
         <div class="cards">
             <div class="card">
                 <h3>Users Overview</h3>
-                <p>Total users: 45</p>
-                <p>Active users: 39</p>
+                <p>Total users: {{ total_users }}</p>
+                <p>Active users: {{ active_users }}</p>
             </div>
             <div class="card">
                 <h3>Recent Orders</h3>
@@ -47,6 +43,73 @@
                 <p>Uptime: 99.99%</p>
                 <p>Last backup: 2 hours ago</p>
             </div>
+        </div>
+
+        <!-- All Operatives Section -->
+        <div id="all-operatives-section" class="all-operatives">
+            <h2>All Operatives</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Login Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in operatives %}
+                    <tr>
+                        <td>{{ user.first_name }}</td>
+                        <td>{{ user.last_name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.status }}</td>
+                        <td>
+                            {% if user.is_logged_in %}
+                                <span style="color: green;">Online</span>
+                            {% else %}
+                                <span style="color: red;">Offline</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Manage Users Section for Pending Registrations -->
+        <div id="manage-users-section" class="manage-users">
+            <h2>Manage User Registrations</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in pending_users %}
+                    <tr>
+                        <td>{{ user.first_name }}</td>
+                        <td>{{ user.last_name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.status }}</td>
+                        <td>
+                            <form action="{{ url_for('main.approve_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="approve-btn">Approve</button>
+                            </form>
+                            <form action="{{ url_for('main.decline_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="decline-btn">Decline</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 

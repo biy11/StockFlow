@@ -10,22 +10,27 @@
     <div class="container">
         <h1>Register for StockFlow</h1>
         <form method="POST" action="{{ url_for('main.register') }}">
+            <label for="first_name">First Name:</label>
+            <input type="text" name="first_name" required>
+        
+            <label for="last_name">Last Name:</label>
+            <input type="text" name="last_name" required>
+        
             <label for="username">Username:</label>
             <input type="text" name="username" required>
-
+        
             <label for="email">Email:</label>
             <input type="email" name="email" required>
-
+        
             <label for="password">Password:</label>
             <input type="password" name="password" required>
-
-            <!-- Add a dropdown for selecting the role -->
+        
             <label for="role">Register as:</label>
             <select name="role" required>
                 <option value="admin">Admin</option>
                 <option value="operative">Operative</option>
             </select>
-
+        
             <input type="submit" value="Register">
         </form>
 
