@@ -1,3 +1,4 @@
+/* static/admin_dashboard.css */
 /* Basic reset */
 * {
     margin: 0;
@@ -51,27 +52,7 @@ body {
     margin-left: 250px;
     padding: 40px;
     width: calc(100% - 250px);
-}
-
-.top-nav {
-    background-color: #343a40;
-    color: white;
-    padding: 15px;
-    text-align: right;
-}
-
-.top-nav button {
-    background-color: #dc3545;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.top-nav button:hover {
-    background-color: #c82333;
+    overflow-y: auto; /* Added to handle overflow */
 }
 
 .dashboard-header {
@@ -205,23 +186,73 @@ th {
     background-color: #4cae4c;
 }
 
-/* Orders Section */
-.orders-section h1 {
+/* Add New Order Button */
+.new-order-section {
+    display: flex;
+    align-items: center;
     margin-top: 40px;
-    font-size: 24px;
 }
 
-.orders-section table {
-    margin-top: 20px;
+.add-order-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
+.add-order-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Query Orders Section */
+.query-orders-section {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.query-orders-section h2 {
+    margin-bottom: 20px;
+    font-size: 22px;
+}
+
+.query-orders-section label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.query-orders-section input {
+    margin-right: 20px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.query-orders-section .query-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.query-orders-section .query-btn:hover {
+    background-color: #0056b3;
+}
 
 /* Add styles to align upload section and new order button side by side */
 .upload-and-new-order {
     display: flex;
-    justify-content: space-between; /* Ensures the two elements are spaced apart */
-    align-items: center; /* Aligns items vertically in the center */
-    margin-bottom: 20px; /* Adds some space below the sections */
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 .new-order-section {
@@ -234,7 +265,8 @@ th {
     background-color: #007bff;
     color: white;
     padding: 10px 20px;
-    border: none;
+    text-decoration: none;
+    border: none; /* Remove border */
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -253,15 +285,17 @@ th {
     top: 0;
     width: 100%;
     height: 100%;
+    overflow: auto; /* Enable scroll if needed */
     background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
 }
 
 .modal-content {
     background-color: #fff;
-    margin: 10% auto;
+    margin: 5% auto; /* Adjusted margin for better positioning */
     padding: 20px;
     border-radius: 8px;
     width: 50%;
+    max-width: 600px; /* Ensure it doesn't get too wide */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -309,12 +343,18 @@ th {
     color: #000;
 }
 
-
-.sorted {
-    font-weight: bold;
-    color: #007bff; /* Blue to highlight */
+/* Ensure the modal content is scrollable if it exceeds viewport height */
+.modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
+/* Responsive adjustments for modal */
+@media (max-width: 600px) {
+    .modal-content {
+        width: 90%;
+    }
+}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {

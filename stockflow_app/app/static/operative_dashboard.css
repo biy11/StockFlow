@@ -1,3 +1,4 @@
+/* operative dash css */
 /* Basic reset */
 * {
     margin: 0;
@@ -115,3 +116,41 @@ h1 {
     font-size: 14px;
     color: #888;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table th {
+    background-color: #f4f4f4;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+
+/* Make the entire card clickable */
+.card-link {
+    text-decoration: none;
+    color: inherit; /* Inherit the color to prevent default link colors */
+    display: block; /* Ensure the anchor acts like a block element */
+}
+
+.card-link .card {
+    cursor: pointer;
+    transition: box-shadow 0.2s ease; /* Add some hover effect */
+}
+
+.card-link .card:hover {
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2); /* Hover effect for cards */
+}
+

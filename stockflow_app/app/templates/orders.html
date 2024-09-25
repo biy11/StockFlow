@@ -1,0 +1,143 @@
+<!-- templates/orders.html -->
+{% extends 'admin_base.html' %}
+
+{% block title %}Orders{% endblock %}
+
+{% block content %}
+    <!-- Upload Orders and Add New Order -->
+    <div class="upload-and-new-order">
+        <!-- File Upload Form for Orders -->
+        <div class="upload-section">
+            <h2>Upload Orders</h2>
+            <form action="{{ url_for('main.upload_orders') }}" method="POST" enctype="multipart/form-data">
+                <label for="file">Choose CSV or Excel file:</label>
+                <input type="file" name="file" id="file" accept=".csv, .xls, .xlsx" required>
+                <button type="submit">Upload</button>
+            </form>
+        </div>
+
+        <!-- Add New Order Button -->
+        <div class="new-order-section">
+            <button id="open-modal-btn" class="add-order-btn">Add New Order</button>
+        </div>
+    </div>
+
+    <!-- Modal for New Order Form -->
+    <div id="order-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Place a New Order</h2>
+            <form action="{{ url_for('main.add_order') }}" method="POST">
+                <label for="company">Company:</label>
+                <input type="text" id="company" name="company" required><br>
+
+                <label for="sku">SKU:</label>
+                <input type="text" id="sku" name="sku" required><br>
+
+                <label for="invoice_no">Invoice NO:</label>
+                <input type="text" id="invoice_no" name="invoice_no" required><br>
+
+                <label for="order_status">Order Status:</label>
+                <input type="text" id="order_status" name="order_status" required><br>
+
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" name="quantity" required><br>
+
+                <label for="eta">ETA:</label>
+                <input type="datetime-local" id="eta" name="eta" required><br>
+
+                <label for="discrepancies">Discrepancies:</label>
+                <input type="text" id="discrepancies" name="discrepancies"><br>
+
+                <label for="cutoff_date">Cutoff Date:</label>
+                <input type="datetime-local" id="cutoff_date" name="cutoff_date" required><br>
+
+                <button type="submit" class="submit-btn">Place Order</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Query Orders Section -->
+    <div class="query-orders-section">
+        <h2>Filter Orders</h2>
+        <form action="{{ url_for('main.orders') }}" method="GET">
+            <label for="company">Company:</label>
+            <input type="text" id="company" name="company" value="{{ request.args.get('company', '') }}">
+
+            <label for="sku">SKU:</label>
+            <input type="text" id="sku" name="sku" value="{{ request.args.get('sku', '') }}">
+
+            <label for="order_status">Order Status:</label>
+            <input type="text" id="order_status" name="order_status" value="{{ request.args.get('order_status', '') }}">
+
+            <label for="eta">ETA (Before):</label>
+            <input type="date" id="eta" name="eta" value="{{ request.args.get('eta', '') }}">
+
+            <label for="cutoff_date">Cutoff Date (Before):</label>
+            <input type="date" id="cutoff_date" name="cutoff_date" value="{{ request.args.get('cutoff_date', '') }}">
+
+            <button type="submit" class="query-btn">Filter Orders</button>
+        </form>
+    </div>
+
+    <!-- All Orders -->
+    <div>
+        <h1>All Orders</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>SKU</th>
+                    <th>Invoice NO</th>
+                    <th>Order Status</th>
+                    <th>Quantity</th>
+                    <th>ETA</th>
+                    <th>Discrepancies</th>
+                    <th>Cutoff Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.company }}</td>
+                    <td>{{ order.sku }}</td>
+                    <td>{{ order.invoice_no }}</td>
+                    <td>{{ order.order_status }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.eta.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ order.discrepancies }}</td>
+                    <td>{{ order.cutoff_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8">No orders found matching your criteria.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- JavaScript to handle modal -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Modal functionality
+            var modal = document.getElementById("order-modal");
+            var openModalBtn = document.getElementById("open-modal-btn");
+            var closeBtn = document.getElementsByClassName("close-btn")[0];
+
+            openModalBtn.onclick = function() {
+                modal.style.display = "block";
+            }
+
+            closeBtn.onclick = function() {
+                modal.style.display = "none";
+            }
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        });
+    </script>
+{% endblock %}

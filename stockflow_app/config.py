@@ -18,6 +18,3 @@ DB_HOST = os.getenv('DB_HOST', 'localhost')
 # Add the SQLAlchemy database URI
 SQLALCHEMY_DATABASE_URI = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}'
 
-print(f"DB_USER: {DB_USER}")
-print(f"DB_PASSWORD: {DB_PASSWORD}")
-print(f"DB_NAME: {DB_NAME}")

@@ -1,6 +1,7 @@
 # models.py
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from datetime import datetime
 from . import db
 
 # models.py
@@ -41,3 +42,10 @@ class Order(db.Model):
     cutoff_date = db.Column(db.DateTime, nullable=False)
     company = db.Column(db.String(100), nullable=True)
 
+class DailyOrder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    order_no = db.Column(db.String(50), nullable=False)
+    customer_name = db.Column(db.String(100), nullable=False)
+    delivery_comment = db.Column(db.String(255), nullable=True)
+    date_assigned = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    status = db.Column(db.String(20), nullable=False, default='pending')  # For future when processed

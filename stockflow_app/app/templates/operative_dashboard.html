@@ -1,3 +1,4 @@
+<!-- operative_dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,10 +38,12 @@
                 <h3>Completed Orders</h3>
                 <p>54 Orders Completed</p>
             </div>
-            <div class="card">
-                <h3>Pending Orders</h3>
-                <p>12 Orders Pending</p>
-            </div>
+            <a href="{{ url_for('main.operative_orders') }}" class="card-link">
+                <div class="card">
+                    <h3>Pending Orders</h3>
+                    <p>12 Orders Pending</p>
+                </div>
+            </a>
             <div class="card">
                 <h3>Assigned Shifts</h3>
                 <p>3 Shifts This Week</p>
