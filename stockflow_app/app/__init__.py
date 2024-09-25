@@ -1,37 +1,51 @@
-from flask import Flask
+# app/__init__.py
+from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+from flask_login import LoginManager, login_required, current_user
 from flask_mail import Mail
-from flask_migrate import Migrate  # Add this import
+from dotenv import load_dotenv
+import os
 
-mail = Mail()
 db = SQLAlchemy()
 login_manager = LoginManager()
-migrate = Migrate()  # Add this
+mail = Mail()
 
 def create_app():
     app = Flask(__name__)
+    load_dotenv()
+    app.config.from_object('config.Config')
 
-    # Load config from config.py
-    app.config.from_pyfile('../config.py')
-
-    # Initialize extensions
     db.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
-    migrate.init_app(app, db)  # Add this line
 
-    # Set login view if a user tries to access a protected route
-    login_manager.login_view = 'main.login'
+    # Import and register Blueprints
+    from app.auth import auth as auth_bp
+    app.register_blueprint(auth_bp)
 
-    # Define user loader for Flask-Login
+    from app.admin import admin as admin_bp
+    app.register_blueprint(admin_bp, url_prefix='/admin')
+
+    from app.operative import operative as operative_bp
+    app.register_blueprint(operative_bp, url_prefix='/operative')
+
+    # Home route
+    @app.route('/')
+    @login_required
+    def home():
+        if current_user.role == 'admin':
+            return redirect(url_for('admin.dashboard'))
+        elif current_user.role == 'operative':
+            return redirect(url_for('operative.dashboard'))
+        return render_template('home.html')
+
+    # User loader callback
+    from app.models import User
+
     @login_manager.user_loader
     def load_user(user_id):
-        from app.models import User
         return User.query.get(int(user_id))
 
-    # Import and register routes
-    from .routes import main
-    app.register_blueprint(main)
-
     return app
+
+app = create_app()

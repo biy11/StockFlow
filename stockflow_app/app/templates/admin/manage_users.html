@@ -1,5 +1,5 @@
 <!-- templates/manage_users.html -->
-{% extends 'admin_base.html' %}
+{% extends 'admin/admin_base.html' %}
 
 {% block title %}Manage Users{% endblock %}
 
@@ -58,10 +58,10 @@
                     <td>{{ user.email }}</td>
                     <td>{{ user.status }}</td>
                     <td>
-                        <form action="{{ url_for('main.approve_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                        <form action="{{ url_for('admin.approve_user', user_id=user.id) }}" method="POST" style="display:inline;">
                             <button type="submit" class="approve-btn">Approve</button>
                         </form>
-                        <form action="{{ url_for('main.decline_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                        <form action="{{ url_for('admin.decline_user', user_id=user.id) }}" method="POST" style="display:inline;">
                             <button type="submit" class="decline-btn">Decline</button>
                         </form>
                     </td>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='operative_dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/operative/operative_dashboard.css') }}">
     <title>Operative Dashboard</title>
 </head>
 <body>
@@ -12,16 +12,13 @@
     <!-- Navigation Bar -->
     <div class="navbar">
         <div class="nav-links">
-            <a href="#">Dashboard</a>
-            <a href="#">Tasks</a>
-            <a href="#">Orders</a>
+            <a href="{{ url_for('operative.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('operative.daily_orders') }}">Daily Orders</a>
             <a href="#">Settings</a>
         </div>
-
+    
         <!-- Logout Button -->
-        <form action="{{ url_for('main.logout') }}" method="POST" style="display:inline;">
-            <button class="logout-btn" type="submit">Logout</button>
-        </form>
+        <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a>
     </div>
 
     <!-- Main Container -->
@@ -38,7 +35,7 @@
                 <h3>Completed Orders</h3>
                 <p>54 Orders Completed</p>
             </div>
-            <a href="{{ url_for('main.operative_orders') }}" class="card-link">
+            <a href="{{ url_for('operative.daily_orders') }}" class="card-link">
                 <div class="card">
                     <h3>Pending Orders</h3>
                     <p>12 Orders Pending</p>
