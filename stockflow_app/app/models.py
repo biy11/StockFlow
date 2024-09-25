@@ -37,6 +37,7 @@ class Order(db.Model):
     order_status = db.Column(db.String(50), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     eta = db.Column(db.DateTime, nullable=False)
-    discrepancies = db.Column(db.String(255), nullable=True)  # Make sure this is a string
+    discrepancies = db.Column(db.String(255), nullable=True) 
     cutoff_date = db.Column(db.DateTime, nullable=False)
+    company = db.Column(db.String(100), nullable=True)
 

@@ -1,3 +1,4 @@
+# routes.py
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
@@ -20,28 +21,46 @@ def home():
     return render_template('home.html')
 
 # Admin Dashboard route (only accessible to admin)
-@main.route('/admin_dashboard')
+@main.route('/admin_dashboard', methods=['GET'])
 @login_required
 def admin_dashboard():
     if current_user.role != 'admin':
         flash('Unauthorized access! Admins only.', 'danger')
         return redirect(url_for('main.home'))
 
-    # Fetch pending users and operatives
+    # Get sorting parameters from the URL
+    sort_by = request.args.get('sort_by', 'cutoff_date')  # Default sort by 'cutoff_date'
+    order = request.args.get('order', 'asc')  # Default order 'asc' (ascending)
+
+    # Construct the sorting expression
+    sort_expression = {
+        'cutoff_date': Order.cutoff_date,
+        'sku': Order.sku,
+        'company': Order.company,
+        'eta': Order.eta,
+        'order_status': Order.order_status,
+        'date': Order.eta  # Assuming 'date' refers to the ETA date
+    }.get(sort_by, Order.cutoff_date)
+
+    if order == 'desc':
+        sort_expression = sort_expression.desc()
+
+    # Fetch pending users and operatives (for other parts of the dashboard)
     pending_users = User.query.filter_by(status='pending').all()
     operatives = User.query.filter_by(role='operative').all()
     total_users = User.query.count()
     active_users = User.query.filter_by(is_active=True).count()
 
-    # Fetch all orders from the database
-    orders = Order.query.all()
+    # Fetch and sort orders from the database
+    orders = Order.query.order_by(sort_expression).all()
 
     return render_template('admin_dashboard.html',
                            pending_users=pending_users,
                            operatives=operatives,
                            total_users=total_users,
                            active_users=active_users,
-                           orders=orders) 
+                           orders=orders)
+
 
 @main.route('/upload_orders', methods=['POST'])
 @login_required
@@ -82,7 +101,8 @@ def upload_orders():
                     quantity=row['Quantity (units)'],
                     eta=pd.to_datetime(row['ETA']),
                     discrepancies=discrepancies,
-                    cutoff_date=pd.to_datetime(row['Cutoff Date'])
+                    cutoff_date=pd.to_datetime(row['Cutoff Date']),
+                    company=row.get('Company', None)
                 )
                 db.session.add(new_order)
 
@@ -227,3 +247,57 @@ def view_orders():
 
     # Pass the orders to the template to be displayed
     return render_template('admin_dashboard.html', orders=orders)
+
+
+
+@main.route('/add_order', methods=['POST'])
+@login_required
+def add_order():
+    if current_user.role != 'admin':
+        flash('Unauthorized access!', 'danger')
+        return redirect(url_for('main.home'))
+
+    # Get form data
+    company = request.form.get('company')
+    sku = request.form.get('sku')
+    invoice_no = request.form.get('invoice_no')
+    order_status = request.form.get('order_status')
+    quantity = request.form.get('quantity')
+    eta = request.form.get('eta')
+    discrepancies = request.form.get('discrepancies')
+    cutoff_date = request.form.get('cutoff_date')
+
+    # Convert eta and cutoff_date to datetime objects
+    try:
+        eta = datetime.strptime(eta, '%Y-%m-%dT%H:%M')
+        cutoff_date = datetime.strptime(cutoff_date, '%Y-%m-%dT%H:%M')
+    except ValueError:
+        flash('Invalid date format for ETA or Cutoff Date.', 'danger')
+        return redirect(url_for('main.admin_dashboard'))
+
+    # Handle discrepancies if empty
+    if not discrepancies:
+        discrepancies = None
+
+    # Create new order object
+    new_order = Order(
+        company=company,
+        sku=sku,
+        invoice_no=invoice_no,
+        order_status=order_status,
+        quantity=int(quantity),
+        eta=eta,
+        discrepancies=discrepancies,
+        cutoff_date=cutoff_date
+    )
+
+    try:
+        # Add the new order to the database
+        db.session.add(new_order)
+        db.session.commit()
+        flash('New order has been successfully placed!', 'success')
+    except Exception as e:
+        flash(f"An error occurred while placing the order: {e}", 'danger')
+        print(f"Error: {e}")  # Debugging: print the exception for clarity
+
+    return redirect(url_for('main.admin_dashboard'))

@@ -119,15 +119,58 @@
         </div>
 
         <!-- Orders Section -->
-        <div id="orders-section" style="display: none;">
-            <!-- File Upload Form for Orders -->
-            <div class="upload-section">
-                <h2>Upload Orders</h2>
-                <form action="{{ url_for('main.upload_orders') }}" method="POST" enctype="multipart/form-data">
-                    <label for="file">Choose CSV or Excel file:</label>
-                    <input type="file" name="file" id="file" accept=".csv, .xls, .xlsx" required>
-                    <button type="submit">Upload</button>
-                </form>
+        <div id="orders-section" style="display: block;">
+            <!-- File Upload Form for Orders and Add New Order button -->
+            <div class="upload-and-new-order">
+                <!-- File Upload Form for Orders -->
+                <div class="upload-section">
+                    <h2>Upload Orders</h2>
+                    <form action="{{ url_for('main.upload_orders') }}" method="POST" enctype="multipart/form-data">
+                        <label for="file">Choose CSV or Excel file:</label>
+                        <input type="file" name="file" id="file" accept=".csv, .xls, .xlsx" required>
+                        <button type="submit">Upload</button>
+                    </form>
+                </div>
+
+                <!-- Add New Order Button -->
+                <div class="new-order-section">
+                    <button id="open-modal-btn" class="add-order-btn">Add New Order</button>
+                </div>
+            </div>
+
+            <!-- Modal for New Order Form -->
+            <div id="order-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-btn">&times;</span>
+                    <h2>Place a New Order</h2>
+                    <form action="{{ url_for('main.add_order') }}" method="POST">
+                        <label for="company">Company:</label>
+                        <input type="text" id="company" name="company" required><br>
+
+                        <label for="sku">SKU:</label>
+                        <input type="text" id="sku" name="sku" required><br>
+
+                        <label for="invoice_no">Invoice NO:</label>
+                        <input type="text" id="invoice_no" name="invoice_no" required><br>
+
+                        <label for="order_status">Order Status:</label>
+                        <input type="text" id="order_status" name="order_status" required><br>
+
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" id="quantity" name="quantity" required><br>
+
+                        <label for="eta">ETA:</label>
+                        <input type="datetime-local" id="eta" name="eta" required><br>
+
+                        <label for="discrepancies">Discrepancies:</label>
+                        <input type="text" id="discrepancies" name="discrepancies"><br>
+
+                        <label for="cutoff_date">Cutoff Date:</label>
+                        <input type="datetime-local" id="cutoff_date" name="cutoff_date" required><br>
+
+                        <button type="submit" class="submit-btn">Place Order</button>
+                    </form>
+                </div>
             </div>
 
             <!-- All Orders -->
@@ -136,18 +179,26 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>SKU</th>
-                            <th>Invoice NO</th>
-                            <th>Order Status</th>
-                            <th>Quantity</th>
-                            <th>ETA</th>
-                            <th>Discrepancies</th>
-                            <th>Cutoff Date</th>
+                            <th><a href="{{ url_for('main.admin_dashboard', sort_by='company', order='asc' if request.args.get('sort_by') != 'company' else 'desc') }}">
+                                    Company
+                                    {% if request.args.get('sort_by') == 'company' %}
+                                        {% if request.args.get('order') == 'asc' %} ▲ {% else %} ▼ {% endif %}
+                                    {% endif %}
+                                </a>
+                            </th>
+                            <th><a href="{{ url_for('main.admin_dashboard', sort_by='sku', order='asc' if request.args.get('sort_by') != 'sku' else 'desc') }}">SKU</a></th>
+                            <th><a href="{{ url_for('main.admin_dashboard', sort_by='invoice_no', order='asc' if request.args.get('sort_by') != 'invoice_no' else 'desc') }}">Invoice NO</a></th>
+                            <th><a href="{{ url_for('main.admin_dashboard', sort_by='order_status', order='asc' if request.args.get('sort_by') != 'order_status' else 'desc') }}">Order Status</a></th>
+                            <th><a href="{{ url_for('main.admin_dashboard', sort_by='quantity', order='asc' if request.args.get('sort_by') != 'quantity' else 'desc') }}">Quantity</a></th>
+                            <th><a href="{{ url_for('main.admin_dashboard', sort_by='eta', order='asc' if request.args.get('sort_by') != 'eta' else 'desc') }}">ETA</a></th>
+                            <th><a href="{{ url_for('main.admin_dashboard', sort_by='discrepancies', order='asc' if request.args.get('sort_by') != 'discrepancies' else 'desc') }}">Discrepancies</a></th>
+                            <th><a href="{{ url_for('main.admin_dashboard', sort_by='cutoff_date', order='asc' if request.args.get('sort_by') != 'cutoff_date' else 'desc') }}">Cutoff Date</a></th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for order in orders %}
                         <tr>
+                            <td>{{ order.company }}</td>
                             <td>{{ order.sku }}</td>
                             <td>{{ order.invoice_no }}</td>
                             <td>{{ order.order_status }}</td>
@@ -164,21 +215,37 @@
 
         <!-- Settings Section -->
         <div id="settings-section" style="display: none;">
-            <!-- Add your settings content here -->
             <h2>Settings</h2>
             <p>Settings content goes here.</p>
         </div>
-
     </div>
 
-    <!-- JavaScript to handle navigation -->
+    <!-- JavaScript to handle modal and navigation -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Get all sections and sidebar links
+            // Modal functionality
+            var modal = document.getElementById("order-modal");
+            var openModalBtn = document.getElementById("open-modal-btn");
+            var closeBtn = document.getElementsByClassName("close-btn")[0];
+
+            openModalBtn.onclick = function() {
+                modal.style.display = "block";
+            }
+
+            closeBtn.onclick = function() {
+                modal.style.display = "none";
+            }
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+
+            // Sidebar navigation
             var sections = document.querySelectorAll('.main-content > div');
             var sidebarLinks = document.querySelectorAll('.sidebar a');
 
-            // Function to show a section
             function showSection(sectionId) {
                 sections.forEach(function(section) {
                     section.style.display = 'none';
@@ -186,7 +253,6 @@
                 document.getElementById(sectionId).style.display = 'block';
             }
 
-            // Function to set active link
             function setActiveLink(activeLink) {
                 sidebarLinks.forEach(function(link) {
                     link.classList.remove('active');
@@ -194,9 +260,7 @@
                 activeLink.classList.add('active');
             }
 
-            // Add click event listeners to sidebar links
             sidebarLinks.forEach(function(link) {
-                // Skip the logout link
                 if (link.classList.contains('logout')) return;
 
                 link.addEventListener('click', function(event) {
@@ -207,7 +271,6 @@
                 });
             });
 
-            // Show the dashboard section by default
             showSection('dashboard-section');
             setActiveLink(document.querySelector('.sidebar a[data-section="dashboard"]'));
         });
