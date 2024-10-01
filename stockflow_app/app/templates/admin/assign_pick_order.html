@@ -1,0 +1,85 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Assign Pick Order{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/assign_pick_orders.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="assign-pick-order-section">
+    <h1>Assign Pick Order</h1>
+
+    <!-- Form to assign new pick order -->
+    <form action="{{ url_for('admin.assign_pick_order') }}" method="POST">
+        <div class="form-group">
+            <label for="order_no">Order Number:</label>
+            <input type="text" id="order_no" name="order_no" required>
+        </div>
+
+        <div class="form-group">
+            <label for="customer_name">Customer Name:</label>
+            <input type="text" id="customer_name" name="customer_name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="delivery_comment">Delivery Comment:</label>
+            <select id="delivery_comment" name="delivery_comment">
+                <option value="">Select an option...</option>
+                <option value="self deliver">Self Deliver</option>
+                <option value="van pickup">Van Pickup</option>
+                <option value="custom">Other (write your own)</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="custom_comment_group" style="display: none;">
+            <label for="custom_comment">Custom Delivery Comment:</label>
+            <input type="text" id="custom_comment" name="custom_comment">
+        </div>
+
+        <button type="submit" class="submit-btn">Place Pick-Order</button>
+    </form>
+</div>
+
+<!-- Display current daily orders -->
+<div class="daily-orders-section">
+    <h1>Current Daily Orders</h1>
+
+    {% if daily_orders %}
+        <div class="orders-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order NO</th>
+                        <th>Customer Name</th>
+                        <th>Delivery Comment</th>
+                        <th>Order Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in daily_orders %}
+                    <tr data-order-id="{{ order.id }}">
+                        <td>{{ order.order_no }}</td>
+                        <td>{{ order.customer_name }}</td>
+                        <td>{{ order.delivery_comment or 'No Comment' }}</td>
+                        <td>{{ order.status }}</td>
+                        <td>
+                            <button class="edit-btn">Edit</button>
+                            <button class="delete-btn">Delete</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No orders assigned for today.</p>
+    {% endif %}
+</div>
+
+<!-- Load Socket.IO library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+<!-- Load your custom JavaScript -->
+<script src="{{ url_for('static', filename='js/admin/pick_orders.js') }}"></script>
+{% endblock %}

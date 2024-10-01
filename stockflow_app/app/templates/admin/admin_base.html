@@ -14,10 +14,17 @@
         <h2>Admin Panel</h2>
         <a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}">Dashboard</a>
         <a href="{{ url_for('admin.manage_users') }}" class="{% if request.endpoint == 'admin.manage_users' %}active{% endif %}">Manage Users</a>
-        <a href="{{ url_for('admin.orders') }}" class="{% if request.endpoint == 'admin.orders' %}active{% endif %}">Orders</a>
+        <div class="dropdown">
+            <a href="#" class="{% if request.endpoint.startswith('admin.orders') %}active{% endif %}">Orders &#9662;</a>
+            <div class="dropdown-content">
+                <a href="{{ url_for('admin.orders') }}" class="{% if request.endpoint == 'admin.orders' %}active{% endif %}">Place New Order</a>
+                <a href="{{ url_for('admin.assign_pick_order') }}" class="{% if request.endpoint == 'admin.assign_pick_order' %}active{% endif %}">Assign Pick Order</a>
+            </div>
+        </div>
         <a href="{{ url_for('admin.settings') }}" class="{% if request.endpoint == 'admin.settings' %}active{% endif %}">Settings</a>
         <a href="{{ url_for('auth.logout') }}" class="logout">Log Out</a>           
     </div>
+
 
     <!-- Main Content -->
     <div class="main-content">

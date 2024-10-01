@@ -1,14 +1,15 @@
-# app/__init__.py
 from flask import Flask, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
 from flask_mail import Mail
+from flask_socketio import SocketIO
 from dotenv import load_dotenv
 import os
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 mail = Mail()
+socketio = SocketIO()  # Initialize globally
 
 def create_app():
     app = Flask(__name__)
@@ -18,6 +19,7 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
+    socketio.init_app(app)  # Bind socketio to the app
 
     # Import and register Blueprints
     from app.auth import auth as auth_bp

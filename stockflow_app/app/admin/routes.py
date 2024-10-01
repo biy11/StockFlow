@@ -1,13 +1,24 @@
 # app/admin/routes.py
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
-from app.models import User, Order
+from app.models import User, Order, DailyOrder
 from app import db
 from datetime import datetime
 import pandas as pd
+from flask_socketio import emit
+from app import socketio
 
 # Define the Blueprint here
 admin = Blueprint('admin', __name__, template_folder='templates')
+
+# Utility function to emit Socket.IO events
+def emit_socket_event(event_name, data):
+    """
+    Utility function to emit Socket.IO events.
+    :param event_name: The name of the event to emit.
+    :param data: Data to send along with the event.
+    """
+    socketio.emit(event_name, data, broadcast=True)
 
 @admin.route('/dashboard')
 @login_required
@@ -53,6 +64,7 @@ def orders():
     cutoff_date = request.args.get('cutoff_date')
     sort_by = request.args.get('sort_by', 'eta')
     sort_order = request.args.get('sort_order', 'asc')
+
     # Build the query dynamically based on the provided filters
     query = Order.query
 
@@ -129,7 +141,6 @@ def add_order():
         print(f"Error: {e}")
 
     return redirect(url_for('admin.orders'))
-
 
 @admin.route('/upload_orders', methods=['POST'])
 @login_required
@@ -219,3 +230,123 @@ def settings():
         flash('Unauthorized access!', 'danger')
         return redirect(url_for('auth.login'))
     return render_template('admin/admin_settings.html')
+
+@admin.route('/assign_pick_order', methods=['GET', 'POST'])
+@login_required
+def assign_pick_order():
+    if current_user.role != 'admin':
+        flash('Unauthorized access! Admins only.', 'danger')
+        return redirect(url_for('auth.login'))
+
+    if request.method == 'POST':
+        try:
+            data = request.get_json()  # Get JSON data from the AJAX request
+            
+            if data is None:
+                raise ValueError("No JSON data received")
+                
+            # Extract data
+            order_no = data.get('order_no')
+            customer_name = data.get('customer_name')
+            delivery_comment = data.get('delivery_comment')
+            
+            # Check if required data is present
+            if not order_no or not customer_name or not delivery_comment:
+                raise ValueError("Missing required fields: order_no, customer_name, or delivery_comment")
+
+            # Create a new DailyOrder object
+            new_daily_order = DailyOrder(
+                order_no=order_no,
+                customer_name=customer_name,
+                delivery_comment=delivery_comment,
+                date_assigned=datetime.utcnow(),
+                status='pending'
+            )
+
+            # Add the new pick order to the database
+            db.session.add(new_daily_order)
+            db.session.commit()
+
+            # Emit a Socket.IO event to update the operatives
+            emit_socket_event('new_pick_order', {
+                'order_no': new_daily_order.order_no,
+                'customer_name': new_daily_order.customer_name,
+                'delivery_comment': new_daily_order.delivery_comment,
+                'status': new_daily_order.status
+            })
+
+            return jsonify({"success": True}), 200
+        except ValueError as ve:
+            print(f"ValueError: {ve}")
+            return jsonify({"error": str(ve)}), 400
+        except Exception as e:
+            db.session.rollback()
+            print(f"Unexpected error: {e}")
+            return jsonify({"error": "An unexpected error occurred: " + str(e)}), 500
+
+    daily_orders = DailyOrder.query.all()
+    return render_template('admin/assign_pick_order.html', daily_orders=daily_orders)
+
+@admin.route('/delete_order/<int:order_id>', methods=['DELETE'])
+@login_required
+def delete_order(order_id):
+    if current_user.role != 'admin':
+        return jsonify({"error": "Unauthorized access!"}), 403
+
+    try:
+        # Find the order to delete
+        order = DailyOrder.query.get_or_404(order_id)
+        
+        # Delete the order from the database
+        db.session.delete(order)
+        db.session.commit()
+        
+        # Emit a Socket.IO event to update the operatives about the deleted order
+        emit_socket_event('delete_pick_order', {'id': order_id})
+
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error deleting order: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@admin.route('/update_order/<int:order_id>', methods=['POST'])
+@login_required
+def update_order(order_id):
+    if current_user.role != 'admin':
+        return jsonify({"error": "Unauthorized access!"}), 403
+
+    try:
+        data = request.get_json()
+        if data is None:
+            raise ValueError("No JSON data received")
+
+        # Get the order from the database
+        order = DailyOrder.query.get_or_404(order_id)
+
+        # Update the order fields with new data
+        order.order_no = data.get('order_no', order.order_no)
+        order.customer_name = data.get('customer_name', order.customer_name)
+        order.delivery_comment = data.get('delivery_comment', order.delivery_comment)
+        order.status = data.get('status', order.status)
+
+        # Commit changes to the database
+        db.session.commit()
+
+        # Emit a Socket.IO event to update the operatives
+        emit_socket_event('update_pick_order', {
+            'id': order.id,
+            'order_no': order.order_no,
+            'customer_name': order.customer_name,
+            'delivery_comment': order.delivery_comment,
+            'status': order.status
+        })
+
+        return jsonify({"success": True}), 200
+    except ValueError as ve:
+        print(f"ValueError: {ve}")
+        return jsonify({"error": str(ve)}), 400
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating order: {e}")
+        return jsonify({"error": str(e)}), 500

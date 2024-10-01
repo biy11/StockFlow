@@ -1,0 +1,125 @@
+/* static/css/admin/assign_pick_orders.css */
+
+/* Assign Pick Order Section */
+.assign-pick-order-section {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.assign-pick-order-section h1 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Form Styling */
+.assign-pick-order-section form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.form-group input[type="text"],
+.form-group select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.submit-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    align-self: flex-start;
+    font-size: 16px;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Daily Orders Section */
+.daily-orders-section {
+    margin-top: 40px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.daily-orders-section h1 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Orders Table Styling */
+.orders-table {
+    overflow-x: auto; /* Handle horizontal overflow */
+}
+
+.orders-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.orders-table th,
+.orders-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+.orders-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.orders-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+    .assign-pick-order-section,
+    .daily-orders-section {
+        padding: 15px;
+    }
+
+    .assign-pick-order-section h1,
+    .daily-orders-section h1 {
+        font-size: 20px;
+    }
+
+    .form-group input[type="text"],
+    .form-group select {
+        font-size: 13px;
+    }
+
+    .submit-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}
