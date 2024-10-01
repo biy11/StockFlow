@@ -18,7 +18,7 @@ def emit_socket_event(event_name, data):
     :param event_name: The name of the event to emit.
     :param data: Data to send along with the event.
     """
-    socketio.emit(event_name, data, broadcast=True)
+    socketio.emit(event_name, data)
 
 @admin.route('/dashboard')
 @login_required
@@ -296,19 +296,20 @@ def delete_order(order_id):
     try:
         # Find the order to delete
         order = DailyOrder.query.get_or_404(order_id)
-        
+
         # Delete the order from the database
         db.session.delete(order)
         db.session.commit()
-        
+
         # Emit a Socket.IO event to update the operatives about the deleted order
-        emit_socket_event('delete_pick_order', {'id': order_id})
+        emit_socket_event('delete_pick_order', {'id': order.id})
 
         return jsonify({"success": True}), 200
     except Exception as e:
         db.session.rollback()
         print(f"Error deleting order: {e}")
         return jsonify({"error": str(e)}), 500
+
 
 @admin.route('/update_order/<int:order_id>', methods=['POST'])
 @login_required
@@ -349,4 +350,24 @@ def update_order(order_id):
     except Exception as e:
         db.session.rollback()
         print(f"Error updating order: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+
+@admin.route('/get_order/<int:order_id>', methods=['GET'])
+@login_required
+def get_order(order_id):
+    if current_user.role != 'admin':
+        return jsonify({"error": "Unauthorized access!"}), 403
+
+    try:
+        # Get the order details
+        order = DailyOrder.query.get_or_404(order_id)
+        return jsonify({"success": True, "order": {
+            "order_no": order.order_no,
+            "customer_name": order.customer_name,
+            "delivery_comment": order.delivery_comment
+        }}), 200
+    except Exception as e:
+        print(f"Error fetching order: {e}")
         return jsonify({"error": str(e)}), 500

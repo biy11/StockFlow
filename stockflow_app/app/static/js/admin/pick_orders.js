@@ -1,5 +1,3 @@
-/* static/js/admin/pick_orders.js */
-
 document.addEventListener('DOMContentLoaded', function() {
     function toggleCustomCommentInput() {
         var deliveryCommentSelect = document.getElementById("delivery_comment");
@@ -26,25 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Listen for 'new_pick_order' events
     socket.on('new_pick_order', function(data) {
         console.log('New pick order event received:', data);
-        var tableBody = document.querySelector('.orders-table tbody');
-        if (tableBody) {
-            var newRow = document.createElement('tr');
-            newRow.setAttribute('data-order-id', data.id);
-            newRow.innerHTML = `
-                <td>${data.order_no}</td>
-                <td>${data.customer_name}</td>
-                <td>${data.delivery_comment || 'No Comment'}</td>
-                <td>${data.status}</td>
-                <td>
-                    <button class="edit-btn">Edit</button>
-                    <button class="delete-btn">Delete</button>
-                </td>
-            `;
-            tableBody.appendChild(newRow);
-            console.log('New pick order added to the table.');
-        } else {
-            console.warn('Table body element not found.');
-        }
+        appendOrderToTable(data);
     });
 
     // Add event listener for the delivery comment dropdown
@@ -57,7 +37,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
     if (form) {
         form.addEventListener('submit', function(event) {
-            event.preventDefault();
+            event.preventDefault(); // Prevent the default form submission
+
             const formData = new FormData(form);
             const data = {
                 order_no: formData.get('order_no'),
@@ -70,26 +51,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 data.delivery_comment = data.custom_comment;
             }
 
-            console.log('Submitting form data:', data);
-
             fetch(form.action, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify(data)
             })
-            .then(response => {
-                console.log('Response received:', response);
-                if (!response.ok) {
-                    return response.json().then(errorData => {
-                        throw new Error('Network response was not ok: ' + errorData.error);
-                    });
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(result => {
-                console.log('Order successfully submitted:', result);
-                form.reset();
-                toggleCustomCommentInput();
+                if (result.success) {
+                    console.log('Order successfully submitted:', result);
+                    form.reset();
+                    toggleCustomCommentInput();
+                } else {
+                    throw new Error(result.error);
+                }
             })
             .catch(error => {
                 console.error('There was a problem with the submission:', error);
@@ -97,40 +74,124 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Event delegation for edit and delete buttons
-    document.querySelector('.orders-table').addEventListener('click', function(event) {
-        const target = event.target;
-        const row = target.closest('tr');
-        const orderId = row.dataset.orderId;
+    // Highlight row on hover and attach click event
+    document.querySelectorAll('.orders-table tbody tr').forEach(row => {
+        row.addEventListener('mouseenter', () => row.classList.add('highlight'));
+        row.addEventListener('mouseleave', () => row.classList.remove('highlight'));
 
-        if (target.classList.contains('delete-btn')) {
-            // Handle delete
-            fetch(`/admin/delete_order/${orderId}`, {
-                method: 'DELETE'
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    row.remove();
-                    console.log('Order deleted successfully.');
-                }
-            })
-            .catch(error => {
-                console.error('There was a problem deleting the order:', error);
-            });
-        } else if (target.classList.contains('edit-btn')) {
-            // Handle edit
-            const orderNo = row.children[0].innerText;
-            const customerName = row.children[1].innerText;
-            const deliveryComment = row.children[2].innerText;
+        // Attach click event for editing the order
+        row.addEventListener('click', function() {
+            const orderId = row.getAttribute('data-id');
+            openEditModal(orderId);
+        });
+    });
 
-            document.getElementById('order_no').value = orderNo;
-            document.getElementById('customer_name').value = customerName;
-            document.getElementById('delivery_comment').value = deliveryComment;
+    // Modal Elements
+    const modal = document.getElementById("editOrderModal");
+    const span = document.getElementsByClassName("close")[0];
+    const editForm = document.getElementById("editOrderForm");
+    const deleteOrderBtn = document.getElementById("deleteOrderBtn");
 
-            if (deliveryComment === 'custom') {
-                document.getElementById('custom_comment_group').style.display = 'block';
-            }
+    // Close modal on click of 'x'
+    span.onclick = function() {
+        modal.style.display = "none";
+    };
+
+    // Close modal on outside click
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
         }
+    };
+
+    // Open modal and populate fields with order data
+    function openEditModal(orderId) {
+        fetch(`/admin/get_order/${orderId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("edit_order_id").value = orderId;
+                document.getElementById("edit_order_no").value = data.order.order_no;
+                document.getElementById("edit_customer_name").value = data.order.customer_name;
+                document.getElementById("edit_delivery_comment").value = data.order.delivery_comment;
+
+                // Display modal
+                modal.style.display = "block";
+            } else {
+                throw new Error(data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching order data:', error);
+        });
+    }
+
+    // Handle update order form submission
+    editForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+    
+        const orderId = document.getElementById("edit_order_id").value;
+        const updatedData = {
+            order_no: document.getElementById("edit_order_no").value,
+            customer_name: document.getElementById("edit_customer_name").value,
+            delivery_comment: document.getElementById("edit_delivery_comment").value
+        };
+    
+        fetch(`/admin/update_order/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedData)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                console.log('Order successfully updated:', result);
+                modal.style.display = "none";
+                
+                // Optionally update the row data here
+                const row = document.querySelector(`tr[data-id="${orderId}"]`);
+                if (row) {
+                    row.querySelector('.order_no').innerText = updatedData.order_no;
+                    row.querySelector('.customer_name').innerText = updatedData.customer_name;
+                    row.querySelector('.delivery_comment').innerText = updatedData.delivery_comment;
+                }
+            } else {
+                throw new Error(result.error);
+            }
+        })
+        .catch(error => {
+            console.error('There was a problem with updating the order:', error);
+            alert('Failed to update the order. Please try again.');
+        });
+    });
+
+    // Handle delete button click
+    deleteOrderBtn.addEventListener('click', function() {
+        const orderId = document.getElementById("edit_order_id").value;
+
+        fetch(`/admin/delete_order/${orderId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                console.log('Order successfully deleted:', result);
+                modal.style.display = "none";
+                
+                // Remove the row from the table
+                const row = document.querySelector(`tr[data-id="${orderId}"]`);
+                if (row) {
+                    row.remove();
+                }
+            } else {
+                throw new Error(result.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting order:', error);
+            alert('Failed to delete the order. Please try again.');
+        });
     });
 });
