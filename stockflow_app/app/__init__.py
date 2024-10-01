@@ -1,7 +1,7 @@
 # app/__init__.py
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_required, current_user
+from flask_login import LoginManager, current_user
 from flask_mail import Mail
 from dotenv import load_dotenv
 import os
@@ -29,15 +29,15 @@ def create_app():
     from app.operative import operative as operative_bp
     app.register_blueprint(operative_bp, url_prefix='/operative')
 
-    # Home route
+    # Redirect home to login if not authenticated
     @app.route('/')
-    @login_required
     def home():
-        if current_user.role == 'admin':
-            return redirect(url_for('admin.dashboard'))
-        elif current_user.role == 'operative':
-            return redirect(url_for('operative.dashboard'))
-        return render_template('home.html')
+        if current_user.is_authenticated:
+            if current_user.role == 'admin':
+                return redirect(url_for('admin.dashboard'))
+            elif current_user.role == 'operative':
+                return redirect(url_for('operative.dashboard'))
+        return redirect(url_for('auth.login'))
 
     # User loader callback
     from app.models import User
@@ -45,6 +45,10 @@ def create_app():
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
+
+    # Configure login manager
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message_category = 'info'
 
     return app
 

@@ -3,6 +3,11 @@
 
 {% block title %}Manage Users{% endblock %}
 
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/manage_users.css') }}">
+{% endblock %}
+
 {% block content %}
     <!-- All Operatives Section -->
     <div class="all-operatives">

@@ -1,0 +1,21 @@
+/* static/css/admin/settings.css */
+
+/* Styles specific to the Settings page */
+
+/* Example styles (add your actual styles here) */
+.settings-container {
+    margin-top: 40px;
+}
+
+.settings-container h2 {
+    margin-bottom: 20px;
+    font-size: 22px;
+    color: #333;
+}
+
+.settings-container p {
+    font-size: 16px;
+    color: #666;
+}
+
+/* Add more styles as needed */

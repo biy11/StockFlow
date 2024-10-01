@@ -51,7 +51,8 @@ def orders():
     order_status = request.args.get('order_status')
     eta = request.args.get('eta')
     cutoff_date = request.args.get('cutoff_date')
-
+    sort_by = request.args.get('sort_by', 'eta')
+    sort_order = request.args.get('sort_order', 'asc')
     # Build the query dynamically based on the provided filters
     query = Order.query
 
@@ -65,6 +66,12 @@ def orders():
         query = query.filter(Order.eta <= eta)
     if cutoff_date:
         query = query.filter(Order.cutoff_date <= cutoff_date)
+
+    if sort_by:
+        if sort_order == 'desc':
+            query = query.order_by(db.desc(getattr(Order, sort_by)))
+        else:
+            query = query.order_by(getattr(Order, sort_by))
 
     # Fetch filtered orders from the database
     orders = query.all()
@@ -122,6 +129,7 @@ def add_order():
         print(f"Error: {e}")
 
     return redirect(url_for('admin.orders'))
+
 
 @admin.route('/upload_orders', methods=['POST'])
 @login_required

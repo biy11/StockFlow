@@ -5,6 +5,8 @@ from datetime import datetime
 from app.models import User
 from app import db
 from app.utils import generate_verification_token, confirm_verification_token, send_email
+from flask import session
+import os
 
 # Define the Blueprint here
 auth = Blueprint('auth', __name__, template_folder='templates')
@@ -88,6 +90,11 @@ def login():
                 user.is_logged_in = True
                 db.session.commit()
 
+                # Set the session as permanent (to allow auto logout on timeout)
+                session.permanent = True
+                # Define the session timeout duration (30 minutes as an example)
+                current_app.permanent_session_lifetime = os.getenv('SESSION_TIMEOUT', 1800)
+
                 if user.role == 'admin':
                     return redirect(url_for('admin.dashboard'))
                 elif user.role == 'operative':
@@ -100,8 +107,15 @@ def login():
 @auth.route('/logout')
 @login_required
 def logout():
+    # Mark the user as logged out
     current_user.is_logged_in = False
     db.session.commit()
+
+    # Clear the session
+    session.clear()
+
+    # Log the user out of Flask-Login
     logout_user()
+
     flash('You have been logged out.', 'success')
     return redirect(url_for('auth.login'))

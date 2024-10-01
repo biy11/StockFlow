@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from datetime import datetime
 # Import your Order model if needed
-# from app.models import Order
+from app.models import DailyOrder
 
 # Define the Blueprint here
 operative = Blueprint('operative', __name__, template_folder='templates')
@@ -24,6 +24,6 @@ def daily_orders():
         return redirect(url_for('auth.login'))
 
     # Replace with actual logic to retrieve daily orders
-    daily_orders = []  # e.g., Order.query.filter_by(...).all()
+    daily_orders = DailyOrder.query.all()  # e.g., Order.query.filter_by(...).all()
 
     return render_template('operative/operative_orders.html', daily_orders=daily_orders)

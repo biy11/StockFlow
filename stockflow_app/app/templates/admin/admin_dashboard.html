@@ -3,6 +3,11 @@
 
 {% block title %}Admin Dashboard{% endblock %}
 
+{% block extra_css %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin_dashboard.css') }}">
+{% endblock %}
+
 {% block content %}
     <!-- Dashboard Header -->
     <div class="dashboard-header">

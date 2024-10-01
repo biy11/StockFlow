@@ -1,0 +1,40 @@
+/* static/css/admin/manage_users.css */
+
+/* All Operatives and Manage Users Sections */
+.all-operatives,
+.manage-users {
+    margin-top: 40px;
+}
+
+.all-operatives h2,
+.manage-users h2 {
+    margin-bottom: 20px;
+    font-size: 22px;
+}
+
+/* Action Buttons */
+.approve-btn {
+    background-color: #5cb85c;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.approve-btn:hover {
+    background-color: #4cae4c;
+}
+
+.decline-btn {
+    background-color: #d9534f;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.decline-btn:hover {
+    background-color: #c9302c;
+}
