@@ -1,6 +1,6 @@
 /* static/css/admin/manage_users.css */
 
-/* All Operatives and Manage Users Sections */
+/* Container for both Operatives and Manage Users sections */
 .all-operatives,
 .manage-users {
     margin-top: 40px;
@@ -9,17 +9,66 @@
 .all-operatives h2,
 .manage-users h2 {
     margin-bottom: 20px;
-    font-size: 22px;
+    font-size: 24px;
+    color: #333;
 }
 
-/* Action Buttons */
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+    font-size: 16px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    color: #333;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Hover effect on table rows */
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Status colors for online/offline text */
+.status-online {
+    color: green;
+    font-weight: bold;
+}
+
+.status-offline {
+    color: red;
+    font-weight: bold;
+}
+
+/* Buttons Styling */
+.approve-btn, .decline-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
 .approve-btn {
     background-color: #5cb85c;
     color: white;
-    padding: 8px 12px;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
 }
 
 .approve-btn:hover {
@@ -29,12 +78,37 @@
 .decline-btn {
     background-color: #d9534f;
     color: white;
-    padding: 8px 12px;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
 }
 
 .decline-btn:hover {
     background-color: #c9302c;
+}
+
+/* Align action buttons next to each other in the same row */
+table td form {
+    display: inline-block;
+    margin: 0 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    table, th, td {
+        font-size: 14px;
+    }
+
+    .approve-btn, .decline-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    table, th, td {
+        font-size: 12px;
+    }
+
+    .approve-btn, .decline-btn {
+        padding: 5px 8px;
+        font-size: 10px;
+    }
 }

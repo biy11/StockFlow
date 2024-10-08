@@ -52,9 +52,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     socket.on('delete_pick_order', function (data) {
         console.log('Delete pick order event received:', data);
-        removeOrderFromTable(data.id);
         pingSound.play();  // Play the sound
         speakMessage(`Order ${data.order_no} has been deleted.`);
+        removeOrderFromTable(data.id);
     });
 
     function speakMessage(message){

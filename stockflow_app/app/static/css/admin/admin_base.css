@@ -1,5 +1,3 @@
-/* static/css/admin/base.css */
-
 /* Basic reset */
 * {
     margin: 0;
@@ -55,31 +53,83 @@ body {
     margin-left: 250px;
     padding: 40px;
     width: calc(100% - 250px);
-    overflow-y: auto; /* Added to handle overflow */
+    overflow-y: auto;
 }
 
-/* Table Styles (common across pages) */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+/* Notification Bell */
+.notifications {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    z-index: 1000;
 }
 
-table, th, td {
+.bell-icon {
+    position: relative;
+    cursor: pointer;
+}
+
+/* Increase size of the bell icon */
+.bell-icon i.fa-bell {
+    font-size: 24px;  /* You can adjust this size */
+    color: #000;  /* Optional: Change the color if needed */
+}
+
+.notification-count {
+    font-size: 14px;  /* Adjust size of the notification count accordingly */
+}
+
+.notification-count {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 5px;
+    font-size: 12px;
+    display: none;
+}
+
+/* Notification Dropdown */
+.notification-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background-color: white;
     border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 250px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-th, td {
-    padding: 12px;
-    text-align: left;
-}
-
-th {
+.notification-dropdown h4 {
+    padding: 10px;
     background-color: #f4f4f4;
-    font-weight: bold;
+    border-bottom: 1px solid #ddd;
 }
 
-/* CSS for Dropdown Menu */
+.notification-dropdown ul {
+    list-style: none;
+    padding: 10px;
+}
+
+.notification-dropdown ul li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.notification-dropdown ul li:hover {
+    background-color: #f9f9f9;
+}
+
+/* Show notifications when bell is clicked */
+.notifications:hover .notification-dropdown {
+    display: block;
+}
+
+/* Dropdown Menu */
 .dropdown {
     position: relative;
     display: inline-block;

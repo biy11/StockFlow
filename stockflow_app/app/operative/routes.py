@@ -64,15 +64,20 @@ def raise_inquiry(order_id):
     if current_user.role != 'operative':
         return jsonify({"error": "Unauthorized access!"}), 403
 
+    # Fetch the order, raise 404 if not found
     order = DailyOrder.query.get_or_404(order_id)
+    
+    # Get the inquiry comment from the JSON request body
     inquiry_comment = request.json.get('comment', '')
-
+    
+    # Check if comment is provided
     if not inquiry_comment:
         return jsonify({"error": "Inquiry comment is required"}), 400
 
+    # Update the order status to "inquiry raised"
     order.status = 'inquiry raised'
 
-    # Log the inquiry in DailyOrderUpdate table
+    # Log the inquiry in the DailyOrderUpdate table
     update_log = DailyOrderUpdate(
         daily_order_id=order.id,
         user_id=current_user.id,
@@ -82,10 +87,20 @@ def raise_inquiry(order_id):
     db.session.add(update_log)
     db.session.commit()
 
+    # Emit the inquiry raised event to admin
+    socketio.emit('inquiry_raised', {
+        'order_no': order.order_no,
+        'customer_name': order.customer_name,  # Correct the typo here
+        'inquiry_comment': inquiry_comment,
+        'raised_by': f"{current_user.first_name} {current_user.last_name}"
+    })
+
+    # Return a successful JSON response
     return jsonify({"success": True, "order": {
         "id": order.id,
         "status": order.status
     }}), 200
+
 
 @operative.route('/update_order_status/<int:order_id>', methods=['POST'])
 @login_required

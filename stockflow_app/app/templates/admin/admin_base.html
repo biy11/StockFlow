@@ -5,9 +5,25 @@
     <meta charset="UTF-8">
     <title>{% block title %}Admin Dashboard{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin_base.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- FontAwesome for bell icon -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Notification Bell -->
+    <div class="notifications">
+        <div class="bell-icon">
+            <span id="notification-count" class="notification-count">0</span>
+            <i class="fa fa-bell"></i>
+        </div>
+        <div id="notification-dropdown" class="notification-dropdown">
+            <h4>Notifications</h4>
+            <ul id="notification-list">
+                <li>No new notifications</li>
+            </ul>
+        </div>
+    </div>
 
     <!-- Sidebar -->
     <div class="sidebar">
@@ -25,12 +41,15 @@
         <a href="{{ url_for('auth.logout') }}" class="logout">Log Out</a>           
     </div>
 
-
     <!-- Main Content -->
     <div class="main-content">
         {% block content %}
         {% endblock %}
     </div>
 
+    <!-- Load Socket.IO client-side library -->
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <!-- Load your JavaScript -->
+    <script src="{{ url_for('static', filename='js/admin/admin_base.js') }}"></script>
 </body>
 </html>
