@@ -48,4 +48,27 @@ class DailyOrder(db.Model):
     customer_name = db.Column(db.String(100), nullable=False)
     delivery_comment = db.Column(db.String(255), nullable=True)
     date_assigned = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    status = db.Column(db.String(20), nullable=False, default='pending')  # For future when processed
+    status = db.Column(db.String(20), nullable=False, default='pending')  # 'pending', 'in process', 'inquiry raised', 'completed'
+
+    updates = db.relationship('DailyOrderUpdate', backref='daily_order', lazy=True, cascade='all, delete-orphan')
+
+# DailyOrderUpdate model to track changes
+class DailyOrderUpdate(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    daily_order_id = db.Column(db.Integer, db.ForeignKey('daily_order.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    changes = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    #daily_order = db.relationship('DailyOrder', backref=db.backref('updates', lazy=True))
+    user = db.relationship('User', backref=db.backref('updates', lazy=True))
+
+class CompletedOutgoingOrder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    order_no = db.Column(db.String(50), nullable=False)
+    customer_name = db.Column(db.String(100), nullable=False)
+    delivery_comment = db.Column(db.String(255), nullable=True)
+    completion_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    operative_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    operative = db.relationship('User', backref=db.backref('completed_orders', lazy=True))

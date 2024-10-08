@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_user, logout_user, current_user, login_required
 from datetime import datetime
 from app.models import User
-from app import db
+from app import db, socketio
 from app.utils import generate_verification_token, confirm_verification_token, send_email
 from flask import session
 import os

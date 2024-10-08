@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
 from flask_mail import Mail
 from flask_socketio import SocketIO
+from flask_migrate import Migrate
 from dotenv import load_dotenv
 import os
 
@@ -10,6 +11,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 mail = Mail()
 socketio = SocketIO()  # Initialize globally
+migrate = Migrate() # Initialize Flask-Migrate
 
 def create_app():
     app = Flask(__name__)
@@ -17,6 +19,7 @@ def create_app():
     app.config.from_object('config.Config')
 
     db.init_app(app)
+    migrate.init_app(app, db)  # Initialize Flask-Migrate with app and db
     login_manager.init_app(app)
     mail.init_app(app)
     socketio.init_app(app)  # Bind socketio to the app

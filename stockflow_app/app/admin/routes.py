@@ -1,12 +1,10 @@
 # app/admin/routes.py
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
-from app.models import User, Order, DailyOrder
-from app import db
+from app.models import User, Order, DailyOrder, DailyOrderUpdate
+from app import db, socketio
 from datetime import datetime
 import pandas as pd
-from flask_socketio import emit
-from app import socketio
 
 # Define the Blueprint here
 admin = Blueprint('admin', __name__, template_folder='templates')
@@ -269,6 +267,7 @@ def assign_pick_order():
 
             # Emit a Socket.IO event to update the operatives
             emit_socket_event('new_pick_order', {
+                'id':new_daily_order.id,
                 'order_no': new_daily_order.order_no,
                 'customer_name': new_daily_order.customer_name,
                 'delivery_comment': new_daily_order.delivery_comment,
@@ -325,13 +324,34 @@ def update_order(order_id):
         # Get the order from the database
         order = DailyOrder.query.get_or_404(order_id)
 
-        # Update the order fields with new data
-        order.order_no = data.get('order_no', order.order_no)
-        order.customer_name = data.get('customer_name', order.customer_name)
-        order.delivery_comment = data.get('delivery_comment', order.delivery_comment)
-        order.status = data.get('status', order.status)
+        # Prepare change description
+        changes = []
+        if 'order_no' in data and data['order_no'] != order.order_no:
+            changes.append(f"Order number changed from {order.order_no} to {data['order_no']}")
+            order.order_no = data['order_no']
+
+        if 'customer_name' in data and data['customer_name'] != order.customer_name:
+            changes.append(f"Customer name changed from {order.customer_name} to {data['customer_name']}")
+            order.customer_name = data['customer_name']
+
+        if 'delivery_comment' in data and data['delivery_comment'] != order.delivery_comment:
+            changes.append(f"Delivery comment changed from {order.delivery_comment} to {data['delivery_comment']}")
+            order.delivery_comment = data['delivery_comment']
+
+        if not changes:
+            return jsonify({"error": "No changes made"}), 400
 
         # Commit changes to the database
+        db.session.commit()
+
+        # Log the update in the DailyOrderUpdate table
+        update_log = DailyOrderUpdate(
+            daily_order_id=order.id,
+            user_id=current_user.id,
+            changes="; ".join(changes),
+            timestamp=datetime.utcnow()
+        )
+        db.session.add(update_log)
         db.session.commit()
 
         # Emit a Socket.IO event to update the operatives
@@ -344,6 +364,7 @@ def update_order(order_id):
         })
 
         return jsonify({"success": True}), 200
+
     except ValueError as ve:
         print(f"ValueError: {ve}")
         return jsonify({"error": str(ve)}), 400

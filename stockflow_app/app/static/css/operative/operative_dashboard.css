@@ -1,4 +1,4 @@
-/* operative dash css */
+/* Operative Dashboard CSS */
 /* Basic reset */
 * {
     margin: 0;
@@ -137,6 +137,11 @@ table tbody tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
+/* Hover effect for table rows */
+table tbody tr:hover {
+    background-color: #e0e0e0;
+    cursor: pointer;
+}
 
 /* Make the entire card clickable */
 .card-link {
@@ -154,3 +159,64 @@ table tbody tr:nth-child(even) {
     box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2); /* Hover effect for cards */
 }
 
+/* Background colors for different order statuses */
+.orders-table tr[data-status="in process"] {
+    background-color: #ffc107; /* Amber */
+}
+
+.orders-table tr[data-status="inquiry raised"] {
+    background-color: #ff4c4c; /* Red */
+}
+
+/* Modal Styles */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    padding-top: 100px; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 10px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.action-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 10px;
+    font-size: 16px;
+}
+
+.action-btn:hover {
+    background-color: #0056b3;
+}

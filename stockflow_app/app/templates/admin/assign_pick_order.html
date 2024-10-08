@@ -1,3 +1,4 @@
+<!-- app/template/assign_pick_order.html-->
 {% extends 'admin/admin_base.html' %}
 
 {% block title %}Assign Pick Order{% endblock %}
@@ -58,7 +59,7 @@
                 </thead>
                 <tbody>
                     {% for order in daily_orders %}
-                    <tr data-id="{{ order.id }}">
+                    <tr data-id="{{ order.id }}" data-status="{{ order.status }}">
                         <td class="order_no">{{ order.order_no }}</td>
                         <td class="customer_name">{{ order.customer_name }}</td>
                         <td class="delivery_comment">{{ order.delivery_comment or 'No Comment' }}</td>

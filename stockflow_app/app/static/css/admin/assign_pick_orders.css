@@ -107,6 +107,16 @@
     cursor: pointer;
 }
 
+/* Background colors for different order statuses */
+.orders-table tr[data-status="in process"] {
+    background-color: #ffc107; /* Amber */
+}
+
+.orders-table tr[data-status="inquiry raised"] {
+    background-color: #ff4c4c; /* Red */
+}
+
+
 /* Modal Styling */
 .modal {
     display: none; /* Hidden by default */

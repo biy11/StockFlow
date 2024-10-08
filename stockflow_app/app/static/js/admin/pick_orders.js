@@ -12,6 +12,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Connect to Socket.IO server
     var socket = io.connect('http://' + document.domain + ':' + location.port);
 
+    // Add these event listeners
+    socket.on('update_pick_order', function(data) {
+        console.log('Update pick order event received:', data);
+        updateOrderInTable(data);
+    });
+
+
+    socket.on('delete_pick_order', function(data) {
+        console.log('Delete pick order event received:', data);
+        removeOrderFromTable(data.id);
+    });
+    
+
     // Log connection status
     socket.on('connect', function() {
         console.log('Connected to Socket.IO server');
@@ -26,6 +39,63 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('New pick order event received:', data);
         appendOrderToTable(data);
     });
+
+
+    // Implement the updateOrderInTable function
+    function updateOrderInTable(data) {
+        var row = document.querySelector(`tr[data-id="${data.id}"]`);
+        if (row) {
+            row.querySelector('.order_status').innerText = data.status;
+            row.dataset.status = data.status;  // Update data-status attribute
+            console.log('Pick order updated in the admin table.');
+        } else {
+            console.warn('Order not found in the table for update.');
+        }
+    }
+
+    // Implement the removeOrderFromTable function
+    function removeOrderFromTable(orderId) {
+        var row = document.querySelector(`tr[data-id="${orderId}"]`);
+        if (row) {
+            row.remove();
+            console.log('Pick order removed from the admin table.');
+        } else {
+            console.warn('Order not found in the table for removal.');
+        }
+    }
+
+    // Function to append a new order to the admin's table
+    function appendOrderToTable(data) {
+        var tableBody = document.querySelector('.orders-table tbody');
+        if (tableBody) {
+            var newRow = document.createElement('tr');
+            newRow.setAttribute('data-id', data.id);
+            newRow.setAttribute('data-status', data.status);
+
+            newRow.innerHTML = `
+                <td class="order_no">${data.order_no}</td>
+                <td class="customer_name">${data.customer_name}</td>
+                <td class="delivery_comment">${data.delivery_comment || 'No Comment'}</td>
+                <td class="order_status">${data.status}</td>
+            `;
+
+            tableBody.appendChild(newRow);
+            console.log('New pick order added to the admin table.');
+
+            // Attach event listeners to the new row
+            newRow.addEventListener('mouseenter', () => newRow.classList.add('highlight'));
+            newRow.addEventListener('mouseleave', () => newRow.classList.remove('highlight'));
+
+            // Attach click event for editing the order
+            newRow.addEventListener('click', function() {
+                const orderId = newRow.getAttribute('data-id');
+                openEditModal(orderId);
+            });
+        } else {
+            console.warn('Table body element not found.');
+        }
+    }
+
 
     // Add event listener for the delivery comment dropdown
     const deliveryCommentSelect = document.getElementById('delivery_comment');

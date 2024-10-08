@@ -1,4 +1,4 @@
-<!-- app/templates/operative/opertive_orders.html -->
+<!-- app/templates/operative/operative_orders.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,34 +23,52 @@
         <h1>Daily Orders</h1>
 
         {% if daily_orders %}
-            <div class="orders-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Order NO</th>
-                            <th>Customer Name</th>
-                            <th>Delivery Comment</th>
-                            <th>Order Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+        <div class="orders-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order NO</th>
+                        <th>Customer Name</th>
+                        <th>Delivery Comment</th>
+                        <th>Order Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if daily_orders %}
                         {% for order in daily_orders %}
-                        <tr data-id="{{ order.id }}">
-                            <td>{{ order.order_no }}</td>
-                            <td>{{ order.customer_name }}</td>
-                            <td>{{ order.delivery_comment or 'No Comment' }}</td>
-                            <td>{{ order.status }}</td>
-                        </tr>
+                            <tr data-id="{{ order.id }}" data-status="{{ order.status }}">
+                                <td>{{ order.order_no }}</td>
+                                <td>{{ order.customer_name }}</td>
+                                <td>{{ order.delivery_comment or 'No Comment' }}</td>
+                                <td class="order_status">{{ order.status }}</td>
+                            </tr>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                    {% else %}
+                        <!-- Optionally, include a row indicating no orders -->
+                        <tr class="no-orders">
+                            <td colspan="4">No orders assigned for today.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        
         {% else %}
             <p>No orders assigned for today.</p>
         {% endif %}
 
         <div class="footer">
             <p>&copy; 2024 Operative Dashboard</p>
+        </div>
+    </div>
+
+    <div id="actionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Choose an Action</h2>
+            <p id="modalMessage"></p>
+            <button id="processOrderBtn" class="action-btn">Process Order</button>
+            <button id="raiseInquiryBtn" class="action-btn">Raise Inquiry</button>
         </div>
     </div>
 
