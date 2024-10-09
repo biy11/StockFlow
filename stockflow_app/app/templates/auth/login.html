@@ -9,15 +9,16 @@
 </head>
 <body>
     <div class="container">
-        <h1>Login to StockFlow</h1>
-        <form method="POST" action="{{ url_for('auth.login') }}">            <label for="email">Email:</label>
-            <input type="email" name="email" required>
-
+        <h1>Login to FEMU StockFlow</h1>
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            <label for="login_identifier">Username or Email:</label>
+            <input type="text" name="login_identifier" value="{{ request.form.login_identifier }}" required> <!-- Prepopulate the field -->
+            
             <label for="password">Password:</label>
-            <input type="password" name="password" required>
-
+            <input type="password" name="password" required {% if request.form.login_identifier %}autofocus{% endif %}> <!-- Add autofocus here -->
+            
             <input type="submit" value="Login">
-        </form>
+        </form>                
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}

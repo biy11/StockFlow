@@ -5,18 +5,22 @@ from flask_mail import Mail
 from flask_socketio import SocketIO
 from flask_migrate import Migrate
 from dotenv import load_dotenv
+from flask_cors import CORS
 import os
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 mail = Mail()
 socketio = SocketIO()  # Initialize globally
-migrate = Migrate() # Initialize Flask-Migrate
+migrate = Migrate()  # Initialize Flask-Migrate
 
 def create_app():
     app = Flask(__name__)
     load_dotenv()
     app.config.from_object('config.Config')
+
+    # Enable CORS
+    CORS(app, resources={r"/socket.io/*":{"origins": "*"}})
 
     db.init_app(app)
     migrate.init_app(app, db)  # Initialize Flask-Migrate with app and db

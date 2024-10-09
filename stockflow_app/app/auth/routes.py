@@ -76,10 +76,16 @@ def verify_email(token):
 def login():
     if request.method == 'POST':
         # Login logic
-        email = request.form['email']
+        # Capture the input, which can be either a username or an email
+        login_identifier = request.form['login_identifier']
         password = request.form['password']
 
-        user = User.query.filter_by(email=email).first()
+        if '@' in login_identifier:
+            user = User.query.filter_by(email=login_identifier).first()
+        else:
+            user = User.query.filter_by(username=login_identifier).first()
+        
+        #check if user exists and the password is correct
         if user and user.check_password(password):
             if user.status == 'pending':
                 flash('Your account has been verified but is still awaiting admin approval.', 'warning')
@@ -92,7 +98,7 @@ def login():
 
                 # Set the session as permanent (to allow auto logout on timeout)
                 session.permanent = True
-                # Define the session timeout duration (30 minutes as an example)
+                # Define the session timeout duration (30 minutes)
                 current_app.permanent_session_lifetime = os.getenv('SESSION_TIMEOUT', 1800)
 
                 if user.role == 'admin':
@@ -100,7 +106,8 @@ def login():
                 elif user.role == 'operative':
                     return redirect(url_for('operative.dashboard'))
 
-        flash('Login failed. Check your email and password.', 'danger')
+        flash('Login failed. Check your username/email and password.', 'danger')
+        return render_template('auth/login.html')
 
     return render_template('auth/login.html')
 

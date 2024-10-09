@@ -1,3 +1,5 @@
+// pick_orders.js
+
 document.addEventListener('DOMContentLoaded', function() {
     function toggleCustomCommentInput() {
         var deliveryCommentSelect = document.getElementById("delivery_comment");
@@ -10,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Connect to Socket.IO server
-    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    var socket = io.connect('http://167.99.193.9:5000');
 
     // Add these event listeners
     socket.on('update_pick_order', function(data) {

@@ -1,6 +1,8 @@
+//daily_orders.js
+
 document.addEventListener('DOMContentLoaded', function () {
     // Connect to Socket.IO server
-    var socket = io();
+    var socket = io.connect('http://167.99.193.9:5000');
 
     const pingSound = new Audio('/static/sound/ping.mp3')
     

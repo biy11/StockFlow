@@ -1,4 +1,4 @@
-#!/home/bilal/StockFlow/stockflow_app/venv/bin/python3
+#!/root/StockFlow/stockflow_app/venv/bin/python3.10
 # -*- coding: utf-8 -*-
 import re
 import sys

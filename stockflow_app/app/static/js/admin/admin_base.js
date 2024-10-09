@@ -1,5 +1,7 @@
+//admin_base.js
+
 document.addEventListener('DOMContentLoaded', function () {
-    var socket = io();  // Connect to the WebSocket server
+    var socket = io.connect('http://167.99.193.9:5000');  // Connect to the WebSocket server
     const notificationCountElement = document.getElementById('notification-count');
     const notificationList = document.getElementById('notification-list');
     let notificationCount = 0;

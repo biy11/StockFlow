@@ -10,3 +10,7 @@ itsdangerous==2.2.0
 click==8.1.7
 python-dotenv==1.0.1
 openpyxl==3.1.5
+gevent==22.10.2
+greenlet==2.0.2
+flask-socketio==5.3.4
+pandas==1.5.3  
