@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Connect to Socket.IO server
-    var socket = io.connect('http://167.99.193.9:5000');
+    var socket = io.connect('wss://stockflow.femutrade.com');
 
     // Add these event listeners
     socket.on('update_pick_order', function(data) {
